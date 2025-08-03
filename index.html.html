@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Equip Residual Profit Calculator</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      margin: 0;
+      padding: 20px;
+      background-color: #ffffff; /* White background */
+      color: #1b2a49;
+    }
+
+    .logo {
+      width: 180px;
+      margin-bottom: 10px;
+    }
+
+    .calculator {
+      max-width: 480px;
+      margin: 0 auto;
+      background-color: #fff;
+      padding: 25px;
+      border-radius: 12px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+    }
+
+    h1 {
+      text-align: center;
+      margin-bottom: 20px;
+      font-size: 2rem;
+      color: #1b2a49;
+    }
+
+    label {
+      display: block;
+      font-size: 1.1rem;
+      margin-top: 15px;
+      font-weight: 600;
+    }
+
+    input {
+      width: 96%;
+      padding: 14px;
+      font-size: 1.1rem;
+      margin-top: 8px;
+      border: 2px solid #dbe2ef;
+      border-radius: 8px;
+
+      /* Remove number input arrows */
+      -moz-appearance: textfield;
+    }
+
+    input::-webkit-outer-spin-button,
+    input::-webkit-inner-spin-button {
+      -webkit-appearance: none;
+      margin: 0;
+    }
+
+    button {
+      width: 100%;
+      margin-top: 25px;
+      padding: 15px;
+      font-size: 1.3rem;
+      background-color: #1b2a49;
+      color: #fff;
+      border: none;
+      border-radius: 10px;
+      cursor: pointer;
+      font-weight: bold;
+    }
+
+    button:hover {
+      background-color: #2c3e70;
+    }
+
+    #result, #bonusResult {
+      margin-top: 25px;
+      font-size: 1.5rem;
+      text-align: center;
+      font-weight: 600;
+      color: #1b2a49;
+    }
+
+    @media (max-width: 600px) {
+      .calculator {
+        padding: 20px;
+      }
+
+      input, button {
+        font-size: 1rem;
+        width: 100%;
+      }
+
+      #result, #bonusResult {
+        font-size: 1.3rem;
+      }
+
+      h1 {
+        font-size: 1.5rem;
+      }
+
+      .logo {
+        width: 140px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <img src="https://i.imgur.com/0sdn8uM.png" alt="Equip Logo" class="logo">
+
+  <div class="calculator">
+    <h1>Equip Residual Profit Calculator</h1>
+
+    <label for="monthlyVolume">Monthly Volume ($)</label>
+    <input type="number" id="monthlyVolume" placeholder="e.g., 50000" />
+
+    <label for="processingRate">Processing Rate (%)</label>
+    <input type="number" step="0.01" id="processingRate" placeholder="e.g., 3.5" />
+
+    <label for="averageTicket">Average Ticket Size ($)</label>
+    <input type="number" step="0.01" id="averageTicket" placeholder="e.g., 20" />
+
+    <label for="repShare">Rep Share (%)</label>
+    <input type="number" step="0.01" id="repShare" placeholder="e.g., 70" />
+
+    <button onclick="calculateProfit()">Calculate</button>
+
+    <div id="result">Estimated Monthly Residual Profit: $0.00</div>
+    <div id="bonusResult">Estimated True Up Bonus Amount: $0.00</div>
+  </div>
+
+  <script>
+    function calculateProfit() {
+      const monthlyVolume = parseFloat(document.getElementById('monthlyVolume').value);
+      const processingRate = parseFloat(document.getElementById('processingRate').value);
+      const averageTicket = parseFloat(document.getElementById('averageTicket').value);
+      const repShare = parseFloat(document.getElementById('repShare').value);
+
+      if (isNaN(monthlyVolume) || isNaN(processingRate) || isNaN(averageTicket) || isNaN(repShare)) {
+        document.getElementById('result').innerHTML = "Please enter all values correctly.";
+        document.getElementById('bonusResult').innerHTML = "";
+        return;
+      }
+
+      let customAmount;
+      if (averageTicket < 15) {
+        customAmount = 2.6;
+      } else if (averageTicket < 18) {
+        customAmount = 2.5;
+      } else if (averageTicket < 25) {
+        customAmount = 2.25;
+      } else if (averageTicket < 65) {
+        customAmount = 2.0;
+      } else if (averageTicket < 100) {
+        customAmount = 1.75;
+      } else {
+        customAmount = 1.6;
+      }
+
+      const adjustedRate = processingRate - customAmount;
+      const baseAmount = monthlyVolume * (adjustedRate / 100) * 0.6;
+      const residualProfit = baseAmount * (repShare / 100);
+
+      // Show residual profit
+      document.getElementById('result').innerHTML = 
+        `Estimated Monthly Residual Profit: $${residualProfit.toFixed(2)}`;
+
+      // True Up Bonus calculation
+      let trueUpRaw = baseAmount * 18;
+      if (trueUpRaw > 10000) trueUpRaw = 10000;
+
+      const trueUpBonus = (trueUpRaw - 1500) * (repShare / 100);
+
+      document.getElementById('bonusResult').innerHTML = 
+        `Estimated True Up Bonus Amount: $${trueUpBonus.toFixed(2)}`;
+    }
+  </script>
+</body>
+</html>
